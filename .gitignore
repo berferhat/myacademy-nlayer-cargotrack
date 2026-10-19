@@ -10,13 +10,13 @@
 *.jfm
 appsettings.*.local.json
 
-## Cursor / AI tooling 
+## Local editor / IDE tooling
 .cursor/
 .cursorrules
 *.mdc
 AGENTS.md
 
-## Stitch / tasarım taslakları (AI çıktısı)
+## Local design drafts (not part of runtime)
 CargoTrack.WebUI/wwwroot/ui-template/
 
 ## OS
