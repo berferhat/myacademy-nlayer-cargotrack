@@ -1,0 +1,77 @@
+﻿@model List<ResultAuditLogDto>
+
+@{
+    ViewData["Title"] = "Audit Log";
+}
+
+<div class="ct-page-header">
+    <div>
+        <h1>Audit Log</h1>
+        <p class="ct-subtitle">Değişiklik kayıtlarını entity, aksiyon ve tarih aralığına göre filtreleyin.</p>
+    </div>
+</div>
+
+<div class="ct-list-card">
+    <div class="ct-list-toolbar">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small text-muted mb-1">Entity</label>
+                <input name="entityName" value="@ViewBag.EntityName" class="form-control" placeholder="örn. Cargo" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted mb-1">Action</label>
+                <input name="actionType" value="@ViewBag.ActionType" class="form-control" placeholder="örn. StatusChange" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted mb-1">Başlangıç</label>
+                <input type="date" name="fromDate" value="@ViewBag.FromDate" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted mb-1">Bitiş</label>
+                <input type="date" name="toDate" value="@ViewBag.ToDate" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-dark w-100" type="submit">Filtrele</button>
+            </div>
+        </form>
+    </div>
+    <div class="table-responsive">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="ct-empty">Kayıt bulunamadı.</div>
+        }
+        else
+        {
+            <table class="ct-table">
+                <thead>
+                    <tr>
+                        <th>Tarih</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Entity</th>
+                        <th>EntityId</th>
+                        <th>Old</th>
+                        <th>New</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="small">@item.ActionDate</td>
+                            <td class="small">@item.UserId</td>
+                            <td><span class="badge rounded-pill text-bg-light border">@item.ActionType</span></td>
+                            <td>@item.EntityName</td>
+                            <td class="small">@item.EntityId</td>
+                            <td class="small text-muted">@item.OldValues</td>
+                            <td class="small text-muted">@item.NewValues</td>
+                            <td>@item.Description</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+    <div class="ct-list-footer">Toplam <strong>@(Model?.Count ?? 0)</strong> kayıt</div>
+</div>

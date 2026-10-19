@@ -1,0 +1,100 @@
+﻿@model CargoTrackResultDto
+@using CargoTrack.Entity.Entities.Enums
+
+@{
+    ViewData["Title"] = "Kargo Detay";
+
+    string StatusLabel(CargoStatus s) => s switch
+    {
+        CargoStatus.Created => "Oluşturuldu",
+        CargoStatus.AtOriginBranch => "Çıkış Şubesinde",
+        CargoStatus.AtTransferCenter => "Transfer Merkezinde",
+        CargoStatus.AtDestinationBranch => "Varış Şubesinde",
+        CargoStatus.OutForDelivery => "Dağıtıma Çıktı",
+        CargoStatus.Delivered => "Teslim Edildi",
+        CargoStatus.DeliveryFailed => "Teslim Başarısız",
+        CargoStatus.InReturnProcess => "İade Sürecinde",
+        CargoStatus.ReturnedToSender => "İade Edildi",
+        _ => s.ToString()
+    };
+}
+
+<div class="ct-page-header">
+    <div>
+        <h1>Operasyon Dosyası</h1>
+        <p class="ct-subtitle"><span class="ct-track">@Model.TrackCode</span> · @StatusLabel(Model.CargoStatus)</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="/Manager/Cargo/ChangeStatus/@ViewBag.CargoId" class="btn btn-dark btn-sm">Durum Değiştir</a>
+        <a href="/Manager/Cargo/Index" class="btn btn-outline-dark btn-sm">Listeye Dön</a>
+    </div>
+</div>
+
+<div class="ct-metric-grid mb-4">
+    <div class="ct-metric-card">
+        <div>
+            <p class="ct-metric-label">Durum</p>
+            <div class="fw-bold" style="color:var(--ct-primary)">@StatusLabel(Model.CargoStatus)</div>
+        </div>
+    </div>
+    <div class="ct-metric-card">
+        <div>
+            <p class="ct-metric-label">Gönderim</p>
+            <div class="fw-bold">@Model.ShipmentDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+        </div>
+    </div>
+    <div class="ct-metric-card">
+        <div>
+            <p class="ct-metric-label">ETA</p>
+            <div class="fw-bold">@Model.EstimatedArrivalDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+        </div>
+    </div>
+    <div class="ct-metric-card">
+        <div>
+            <p class="ct-metric-label">Teslimat Kodu</p>
+            <div class="fw-bold ct-track">@(string.IsNullOrWhiteSpace(Model.DeliveryCode) ? "—" : Model.DeliveryCode)</div>
+        </div>
+    </div>
+</div>
+
+<div class="ct-list-card mb-4">
+    <div class="ct-list-toolbar"><strong style="color:var(--ct-primary)">Güzergâh</strong></div>
+    <div class="p-3">
+        <p class="mb-1"><strong>Çıkış:</strong> @(Model.OriginBranchName ?? "—") (@(Model.OriginCityName ?? "—"))</p>
+        <p class="mb-0"><strong>Varış:</strong> @(Model.DestinationBranchName ?? "—") (@(Model.DestinationCityName ?? "—"))</p>
+    </div>
+</div>
+
+<div class="ct-list-card">
+    <div class="ct-list-toolbar"><strong style="color:var(--ct-primary)">Hareket Geçmişi</strong></div>
+    <div class="table-responsive">
+        <table class="ct-table">
+            <thead>
+                <tr>
+                    <th>Tarih</th>
+                    <th>Durum</th>
+                    <th>Şube</th>
+                    <th>Açıklama</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Movements == null || !Model.Movements.Any())
+                {
+                    <tr><td colspan="4" class="ct-empty">Henüz hareket kaydı yok.</td></tr>
+                }
+                else
+                {
+                    foreach (var m in Model.Movements)
+                    {
+                        <tr>
+                            <td>@m.MovementDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@StatusLabel(m.NewStatus)</td>
+                            <td>@(m.BranchName ?? "—")</td>
+                            <td>@(m.Description ?? "—")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

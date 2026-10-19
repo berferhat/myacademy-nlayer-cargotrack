@@ -1,0 +1,52 @@
+﻿@model List<ResultUserDto>
+
+@{
+    ViewData["Title"] = "Rol Atama";
+    int count = 0;
+}
+
+<div class="ct-page-header">
+    <div>
+        <h1>Kullanıcı Rolleri</h1>
+        <p class="ct-subtitle">Identity kullanıcılarına Admin / Manager / User rolü atayın.</p>
+    </div>
+</div>
+
+<div class="ct-list-card">
+    <div class="table-responsive">
+        <table class="ct-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Ad Soyad</th>
+                    <th>Email</th>
+                    <th>Kullanıcı Adı</th>
+                    <th>Roller</th>
+                    <th class="text-center">İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    count++;
+                    <tr>
+                        <td class="text-muted small">@count</td>
+                        <td class="fw-semibold">@item.FullName</td>
+                        <td>@item.Email</td>
+                        <td>@item.UserName</td>
+                        <td>
+                            @foreach (var role in item.Roles)
+                            {
+                                <span class="badge rounded-pill me-1" style="background:var(--ct-surface);color:var(--ct-primary);border:1px solid var(--ct-border)">@role</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <a href="/Admin/RoleAssign/AssignRole/@item.Id" class="btn btn-sm btn-dark">Rol Ata</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="ct-list-footer">Toplam <strong>@count</strong> kullanıcı</div>
+</div>

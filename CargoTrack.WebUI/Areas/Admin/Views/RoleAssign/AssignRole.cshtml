@@ -1,0 +1,33 @@
+﻿@model List<RoleAssignDto>
+@{
+    ViewData["Title"] = "Rol Ata";
+}
+
+<div class="ct-page-header">
+    <div>
+        <h1>Rol Atama</h1>
+        <p class="ct-subtitle"><strong>@ViewBag.fullName</strong> kullanıcısı için rolleri seçin.</p>
+    </div>
+    <a href="/Admin/RoleAssign" class="btn btn-outline-dark btn-sm">Listeye Dön</a>
+</div>
+
+<div class="ct-form-card">
+    <form method="post">
+        <div class="d-flex flex-column gap-3 mb-4">
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <label class="d-flex align-items-center gap-3 p-3 border rounded-3" style="border-color:var(--ct-border)!important;cursor:pointer">
+                    <input type="checkbox" asp-for="@Model[i].RoleExist" class="form-check-input m-0" style="width:1.15rem;height:1.15rem" />
+                    <span class="fw-semibold" style="color:var(--ct-primary)">@Model[i].RoleName</span>
+                    <input type="hidden" asp-for="@Model[i].RoleName" />
+                    <input type="hidden" asp-for="@Model[i].RoleId" />
+                    <input type="hidden" asp-for="@Model[i].UserId" />
+                </label>
+            }
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-dark" type="submit">Rol Ata</button>
+            <a href="/Admin/RoleAssign" class="btn btn-outline-dark">İptal</a>
+        </div>
+    </form>
+</div>

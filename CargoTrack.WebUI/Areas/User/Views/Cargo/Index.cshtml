@@ -1,0 +1,170 @@
+﻿@model List<ResultCargoDto>
+@using CargoTrack.Entity.Entities.Enums
+
+@{
+    ViewData["Title"] = "Kargolarım";
+    var activeTab = (ViewBag.ActiveTab as string) ?? "aktif";
+    int activeCount = ViewBag.ActiveCount ?? Model.Count;
+    int incomingCount = ViewBag.IncomingCount ?? 0;
+    int outgoingCount = ViewBag.OutgoingCount ?? 0;
+    int historyCount = ViewBag.HistoryCount ?? 0;
+    int outForDeliveryCount = ViewBag.OutForDeliveryCount ?? 0;
+    int deliveredCount = ViewBag.DeliveredCount ?? 0;
+    decimal totalPrice = ViewBag.TotalPrice ?? 0m;
+
+    string StatusCss(CargoStatus s) => s switch
+    {
+        CargoStatus.Delivered or CargoStatus.ReturnedToSender => "ct-status-done",
+        CargoStatus.OutForDelivery => "ct-status-delivery",
+        CargoStatus.AtTransferCenter or CargoStatus.AtOriginBranch or CargoStatus.AtDestinationBranch => "ct-status-transit",
+        CargoStatus.DeliveryFailed or CargoStatus.InReturnProcess => "ct-status-fail",
+        _ => "ct-status-created"
+    };
+
+    string StatusLabel(CargoStatus s) => s switch
+    {
+        CargoStatus.Created => "Oluşturuldu",
+        CargoStatus.AtOriginBranch => "Çıkış Şubesinde",
+        CargoStatus.AtTransferCenter => "Transfer Merkezinde",
+        CargoStatus.AtDestinationBranch => "Varış Şubesinde",
+        CargoStatus.OutForDelivery => "Dağıtıma Çıktı",
+        CargoStatus.Delivered => "Teslim Edildi",
+        CargoStatus.DeliveryFailed => "Teslim Başarısız",
+        CargoStatus.InReturnProcess => "İade Sürecinde",
+        CargoStatus.ReturnedToSender => "İade Edildi",
+        _ => s.ToString()
+    };
+}
+
+<div class="ct-page-header">
+    <div>
+        <h1>
+            Kargolarım
+            <span class="ct-badge-count">@activeCount Aktif Kargo</span>
+        </h1>
+        <p class="ct-subtitle">Tüm aktif, gelen ve geçmiş gönderilerinizi tek panelden takip edin.</p>
+    </div>
+</div>
+
+<div class="ct-metric-grid">
+    <div class="ct-metric-card">
+        <div>
+            <p class="ct-metric-label">Aktif Gönderiler</p>
+            <div class="ct-metric-value">@activeCount</div>
+            <div class="ct-metric-hint">gönderi işlemde</div>
+        </div>
+        <div class="ct-metric-icon navy">
+            <span class="material-symbols-outlined">inventory_2</span>
+        </div>
+    </div>
+    <div class="ct-metric-card">
+        <div>
+            <p class="ct-metric-label">Dağıtımdaki Kargolar</p>
+            <div class="ct-metric-value" style="color:#ea7000">@outForDeliveryCount</div>
+            <div class="ct-metric-hint">dağıtımda</div>
+        </div>
+        <div class="ct-metric-icon amber">
+            <span class="material-symbols-outlined">local_shipping</span>
+        </div>
+    </div>
+    <div class="ct-metric-card">
+        <div>
+            <p class="ct-metric-label">Teslim Edilenler</p>
+            <div class="ct-metric-value" style="color:#2e7d32">@deliveredCount</div>
+            <div class="ct-metric-hint">tamamlanan</div>
+        </div>
+        <div class="ct-metric-icon green">
+            <span class="material-symbols-outlined">check_circle</span>
+        </div>
+    </div>
+    <div class="ct-metric-card">
+        <div>
+            <p class="ct-metric-label">Toplam Gönderi Tutarı</p>
+            <div class="ct-metric-value">@totalPrice.ToString("N2") <span style="font-size:0.9rem">₺</span></div>
+        </div>
+        <div class="ct-metric-icon orange">
+            <span class="material-symbols-outlined">payments</span>
+        </div>
+    </div>
+</div>
+
+<div class="ct-list-card">
+    <div class="ct-list-toolbar">
+        <div class="ct-tabs" role="tablist">
+            <a href="/User/Cargo/Index" class="@(activeTab == "aktif" ? "active" : null)">
+                Aktif <span class="ct-tab-count">@activeCount</span>
+            </a>
+            <a href="/User/Cargo/Incoming" class="@(activeTab == "gelen" ? "active" : null)">
+                Gelen <span class="ct-tab-count">@incomingCount</span>
+            </a>
+            <a href="/User/Cargo/Outgoing" class="@(activeTab == "giden" ? "active" : null)">
+                Giden <span class="ct-tab-count">@outgoingCount</span>
+            </a>
+            <a href="/User/Cargo/History" class="@(activeTab == "gecmis" ? "active" : null)">
+                Geçmiş <span class="ct-tab-count">@historyCount</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="ct-empty">
+                <span class="material-symbols-outlined" style="font-size:2.5rem;opacity:0.4">inbox</span>
+                <p class="mt-2 mb-0">Bu listede henüz kargo yok.</p>
+            </div>
+        }
+        else
+        {
+            <table class="ct-table">
+                <thead>
+                    <tr>
+                        <th style="width:3rem;text-align:center">#</th>
+                        <th>Takip No</th>
+                        <th>Tip</th>
+                        <th>Durum</th>
+                        <th>Gönderim</th>
+                        <th>Tahmini Varış</th>
+                        <th class="text-end">Fiyat</th>
+                        <th class="text-center">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 0;
+                    }
+                    @foreach (var item in Model.OrderByDescending(c => c.ShipmentDate))
+                    {
+                        i++;
+                        <tr>
+                            <td class="text-center text-muted small">@i</td>
+                            <td>
+                                <div class="ct-track">@item.TrackCode</div>
+                                <div class="small text-muted">@item.CargoType</div>
+                            </td>
+                            <td>@item.PackageSize</td>
+                            <td>
+                                <span class="ct-status @StatusCss(item.CargoStatus)">
+                                    <span class="dot"></span>
+                                    @StatusLabel(item.CargoStatus)
+                                </span>
+                            </td>
+                            <td>@item.ShipmentDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@item.EstimatedArrivalDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td class="text-end">
+                                @(item.Price.HasValue ? $"{item.Price:N2} ₺" : "—")
+                            </td>
+                            <td class="text-center">
+                                <a href="/User/Cargo/Details/@item.Id" class="btn btn-sm btn-outline-dark">Detay</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <div class="ct-list-footer">
+        Toplam <strong style="color:var(--ct-primary)">@(Model?.Count ?? 0)</strong> gönderi listeleniyor
+    </div>
+</div>

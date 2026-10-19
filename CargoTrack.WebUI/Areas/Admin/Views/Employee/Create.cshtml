@@ -1,0 +1,48 @@
+﻿@model CreateEmployeeDto
+
+@{
+    ViewData["Title"] = "Yeni Çalışan";
+}
+
+<div class="ct-page-header">
+    <div>
+        <h1>Yeni Çalışan</h1>
+        <p class="ct-subtitle">Ad, soyad, ünvan, şube ve isteğe bağlı AppUser bağlantısı.</p>
+    </div>
+    <a href="/Admin/Employee" class="btn btn-outline-dark btn-sm">Listeye Dön</a>
+</div>
+
+<div class="ct-form-card">
+    <form method="post">
+        <div class="row g-3">
+            <div class="col-md-6 mb-3">
+                <label class="form-label" asp-for="FirstName">Ad</label>
+                <input asp-for="FirstName" class="form-control" />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label" asp-for="LastName">Soyad</label>
+                <input asp-for="LastName" class="form-control" />
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" asp-for="Title">Ünvan</label>
+            <input asp-for="Title" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label" asp-for="BranchId">Şube</label>
+            <select asp-for="BranchId" class="form-select" asp-items="@ViewBag.branches">
+                <option disabled selected>---Şube Seçiniz---</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" asp-for="AppUserId">Kullanıcı (opsiyonel)</label>
+            <select asp-for="AppUserId" class="form-select" asp-items="@ViewBag.users">
+                <option value="">---Yok---</option>
+            </select>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-dark" type="submit">Kaydet</button>
+            <a href="/Admin/Employee" class="btn btn-outline-dark">İptal</a>
+        </div>
+    </form>
+</div>

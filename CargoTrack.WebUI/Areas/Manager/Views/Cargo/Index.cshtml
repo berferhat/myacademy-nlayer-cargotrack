@@ -1,0 +1,125 @@
+﻿@model List<ResultCargoDto>
+@using CargoTrack.Entity.Entities.Enums
+
+@{
+    ViewData["Title"] = "Kargolar";
+    int page = ViewBag.Page ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+
+    string StatusCss(CargoStatus s) => s switch
+    {
+        CargoStatus.Delivered or CargoStatus.ReturnedToSender => "ct-status-done",
+        CargoStatus.OutForDelivery => "ct-status-delivery",
+        CargoStatus.AtTransferCenter or CargoStatus.AtOriginBranch or CargoStatus.AtDestinationBranch => "ct-status-transit",
+        CargoStatus.DeliveryFailed or CargoStatus.InReturnProcess => "ct-status-fail",
+        _ => "ct-status-created"
+    };
+
+    string StatusLabel(CargoStatus s) => s switch
+    {
+        CargoStatus.Created => "Oluşturuldu",
+        CargoStatus.AtOriginBranch => "Çıkış Şubesinde",
+        CargoStatus.AtTransferCenter => "Transfer Merkezinde",
+        CargoStatus.AtDestinationBranch => "Varış Şubesinde",
+        CargoStatus.OutForDelivery => "Dağıtıma Çıktı",
+        CargoStatus.Delivered => "Teslim Edildi",
+        CargoStatus.DeliveryFailed => "Teslim Başarısız",
+        CargoStatus.InReturnProcess => "İade Sürecinde",
+        CargoStatus.ReturnedToSender => "İade Edildi",
+        _ => s.ToString()
+    };
+}
+
+<div class="ct-page-header">
+    <div>
+        <h1>Kargolar</h1>
+        <p class="ct-subtitle">Şubenize bağlı gönderileri filtreleyin ve operasyon işlemlerini yönetin.</p>
+    </div>
+    <a href="/Manager/Cargo/Create" class="btn btn-dark btn-sm">Yeni Kargo</a>
+</div>
+
+<div class="ct-list-card mb-3">
+    <div class="ct-list-toolbar">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label small text-muted mb-1">Takip no</label>
+                <input name="search" value="@ViewBag.Search" class="form-control" placeholder="Takip no ara..." />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small text-muted mb-1">Durum</label>
+                <select name="status" class="form-control" asp-items="@ViewBag.statuses">
+                    <option value="">Tüm durumlar</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-dark w-100" type="submit">Filtrele</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="ct-empty">Bu filtrede kargo bulunamadı.</div>
+        }
+        else
+        {
+            <table class="ct-table">
+                <thead>
+                    <tr>
+                        <th style="width:3rem;text-align:center">#</th>
+                        <th>Takip No</th>
+                        <th>Durum</th>
+                        <th>Gönderim</th>
+                        <th>Tahmini Varış</th>
+                        <th class="text-end">Fiyat</th>
+                        <th>Teslim Kodu</th>
+                        <th class="text-center">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int count = (page - 1) * 10;
+                    }
+                    @foreach (var item in Model)
+                    {
+                        count++;
+                        <tr>
+                            <td class="text-center text-muted small">@count</td>
+                            <td><span class="ct-track">@item.TrackCode</span></td>
+                            <td>
+                                <span class="ct-status @StatusCss(item.CargoStatus)">
+                                    <span class="dot"></span>
+                                    @StatusLabel(item.CargoStatus)
+                                </span>
+                            </td>
+                            <td>@item.ShipmentDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@item.EstimatedArrivalDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td class="text-end fw-bold">@(item.Price.HasValue ? $"{item.Price:N2} ₺" : "—")</td>
+                            <td>@(string.IsNullOrEmpty(item.DeliveryCode) ? "—" : item.DeliveryCode)</td>
+                            <td class="text-center">
+                                <a href="/Manager/Cargo/ChangeStatus/@item.Id" class="btn btn-sm btn-outline-dark me-1">Durum</a>
+                                <a href="/Manager/Cargo/Details/@item.Id" class="btn btn-sm btn-outline-dark">Detay</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    @if (totalPages > 1)
+    {
+        <div class="ct-list-footer d-flex flex-wrap gap-2 align-items-center">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <a class="btn btn-sm @(i == page ? "btn-dark" : "btn-outline-dark")"
+                   href="?search=@ViewBag.Search&status=@Context.Request.Query["status"]&page=@i">@i</a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="ct-list-footer">Toplam <strong>@(Model?.Count ?? 0)</strong> gönderi</div>
+    }
+</div>

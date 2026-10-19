@@ -1,0 +1,142 @@
+﻿@model CargoTrackResultDto
+@using CargoTrack.Entity.Entities.Enums
+
+@{
+    ViewData["Title"] = "Kargo Detay";
+
+    string StatusLabel(CargoStatus s) => s switch
+    {
+        CargoStatus.Created => "Oluşturuldu",
+        CargoStatus.AtOriginBranch => "Çıkış Şubesinde",
+        CargoStatus.AtTransferCenter => "Transfer Merkezinde",
+        CargoStatus.AtDestinationBranch => "Varış Şubesinde",
+        CargoStatus.OutForDelivery => "Dağıtıma Çıktı",
+        CargoStatus.Delivered => "Teslim Edildi",
+        CargoStatus.DeliveryFailed => "Teslim Başarısız",
+        CargoStatus.InReturnProcess => "İade Sürecinde",
+        CargoStatus.ReturnedToSender => "İade Edildi",
+        _ => s.ToString()
+    };
+}
+
+<div class="ct-page-header">
+    <div>
+        <h1>Gönderi Detayı</h1>
+        <p class="ct-subtitle">Takip no: <span class="ct-track">@Model.TrackCode</span> · @StatusLabel(Model.CargoStatus)</p>
+    </div>
+    <a href="/User/Cargo/Index" class="btn btn-outline-dark btn-sm">Kargolarıma Dön</a>
+</div>
+
+@{
+    var steps = new[] {
+        CargoStatus.Created,
+        CargoStatus.AtOriginBranch,
+        CargoStatus.AtTransferCenter,
+        CargoStatus.AtDestinationBranch,
+        CargoStatus.OutForDelivery,
+        CargoStatus.Delivered
+    };
+    var currentIdx = Array.IndexOf(steps, Model.CargoStatus);
+    if (Model.CargoStatus is CargoStatus.DeliveryFailed or CargoStatus.InReturnProcess or CargoStatus.ReturnedToSender)
+        currentIdx = -1;
+}
+<div class="ct-list-card mb-4">
+    <div class="ct-list-toolbar"><strong style="color:var(--ct-primary)">Durum İlerlemesi</strong></div>
+    <div class="p-3 d-flex flex-wrap gap-2 align-items-center justify-content-between">
+        @for (var si = 0; si < steps.Length; si++)
+        {
+            var done = currentIdx >= 0 && si <= currentIdx;
+            <div class="text-center flex-fill" style="min-width:5.5rem">
+                <div class="mx-auto mb-1 rounded-circle d-flex align-items-center justify-content-center"
+                     style="width:1.75rem;height:1.75rem;font-size:0.7rem;font-weight:700;@(done ? "background:var(--ct-primary);color:#fff" : "background:#e2e8f0;color:var(--ct-muted)")">
+                    @(si + 1)
+                </div>
+                <div class="small" style="color:@(done ? "var(--ct-primary)" : "var(--ct-muted)");font-weight:@(done ? "700" : "500")">
+                    @StatusLabel(steps[si])
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger">@TempData["error"]</div>
+}
+
+<div class="ct-metric-grid mb-4">
+    <div class="ct-metric-card">
+        <div>
+            <p class="ct-metric-label">Durum</p>
+            <div class="fw-bold" style="color:var(--ct-primary)">@StatusLabel(Model.CargoStatus)</div>
+        </div>
+        <div class="ct-metric-icon amber">
+            <span class="material-symbols-outlined">local_shipping</span>
+        </div>
+    </div>
+    <div class="ct-metric-card">
+        <div>
+            <p class="ct-metric-label">Gönderim</p>
+            <div class="fw-bold">@Model.ShipmentDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+        </div>
+        <div class="ct-metric-icon navy">
+            <span class="material-symbols-outlined">calendar_month</span>
+        </div>
+    </div>
+    <div class="ct-metric-card">
+        <div>
+            <p class="ct-metric-label">Tahmini Varış</p>
+            <div class="fw-bold">@Model.EstimatedArrivalDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+        </div>
+        <div class="ct-metric-icon green">
+            <span class="material-symbols-outlined">event_available</span>
+        </div>
+    </div>
+    <div class="ct-metric-card">
+        <div>
+            <p class="ct-metric-label">Güzergâh</p>
+            <div class="fw-bold small">@(Model.OriginBranchName ?? "—") → @(Model.DestinationBranchName ?? "—")</div>
+        </div>
+        <div class="ct-metric-icon orange">
+            <span class="material-symbols-outlined">route</span>
+        </div>
+    </div>
+</div>
+
+<div class="ct-list-card">
+    <div class="ct-list-toolbar">
+        <strong style="color:var(--ct-primary)">Hareket Geçmişi</strong>
+    </div>
+    <div class="table-responsive">
+        <table class="ct-table">
+            <thead>
+                <tr>
+                    <th>Tarih</th>
+                    <th>Durum</th>
+                    <th>Şube</th>
+                    <th>Açıklama</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Movements == null || !Model.Movements.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="ct-empty">Henüz hareket kaydı yok.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var m in Model.Movements)
+                    {
+                        <tr>
+                            <td>@m.MovementDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@StatusLabel(m.NewStatus)</td>
+                            <td>@(m.BranchName ?? "—")</td>
+                            <td>@(m.Description ?? "—")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

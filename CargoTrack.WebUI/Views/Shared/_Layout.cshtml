@@ -1,0 +1,132 @@
+﻿@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    var area = ViewContext.RouteData.Values["area"]?.ToString() ?? "";
+    var userName = User.Identity?.Name ?? "";
+    var initials = string.IsNullOrWhiteSpace(userName)
+        ? "?"
+        : string.Concat(userName.Where(char.IsLetterOrDigit).Take(2)).ToUpperInvariant();
+    if (string.IsNullOrEmpty(initials)) initials = "?";
+
+    string HomeHref()
+    {
+        if (User.IsInRole("Admin")) return "/Admin/Dashboard";
+        if (User.IsInRole("Manager")) return "/Manager/Dashboard";
+        if (User.IsInRole("User")) return "/User/Dashboard";
+        return "/Default/Index";
+    }
+
+    string RoleLabel()
+    {
+        if (User.IsInRole("Admin")) return "Yönetici";
+        if (User.IsInRole("Manager")) return "Şube Yöneticisi";
+        if (User.IsInRole("User")) return "Kullanıcı";
+        return "";
+    }
+
+    bool NavActive(string areaName, string controllerName, string? actionName = null)
+    {
+        if (!string.Equals(area, areaName, StringComparison.OrdinalIgnoreCase)) return false;
+        if (!string.Equals(controller, controllerName, StringComparison.OrdinalIgnoreCase)) return false;
+        if (actionName == null) return true;
+        return string.Equals(action, actionName, StringComparison.OrdinalIgnoreCase);
+    }
+
+    string NavClass(bool active) => active
+        ? "text-primary-container font-semibold border-b-2 border-primary-container py-4 text-label-md font-label-md"
+        : "text-on-surface-variant py-4 hover:text-primary-container transition-colors duration-150 text-label-md font-label-md";
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CargoTrack</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..800;1,300..800&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <partial name="_StitchTailwindConfig" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/CargoTrack.WebUI.styles.css" asp-append-version="true" />
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col font-body-md text-body-md">
+    <header class="bg-surface sticky top-0 z-50 border-b border-outline-variant">
+        <div class="w-full min-h-14 flex flex-wrap justify-between items-center gap-2 max-w-[1200px] mx-auto px-margin-sm md:px-margin py-1">
+            <div class="flex items-center gap-space-lg flex-wrap min-w-0">
+                <a class="flex items-center gap-space-xs shrink-0" href="@HomeHref()">
+                    <img src="~/images/cargotrack-logo.svg" alt="CargoTrack" class="h-8 w-auto" asp-append-version="true" />
+                </a>
+                <nav class="flex items-center flex-wrap gap-x-5 gap-y-0 text-label-md font-label-md">
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a class="@NavClass(NavActive("Admin","Dashboard"))" href="/Admin/Dashboard">Dashboard</a>
+                        <a class="@NavClass(NavActive("Admin","Cargo"))" href="/Admin/Cargo">Kargolar</a>
+                        <a class="@NavClass(NavActive("Admin","Branch"))" href="/Admin/Branch">Şubeler</a>
+                        <a class="@NavClass(NavActive("Admin","Employee"))" href="/Admin/Employee">Çalışanlar</a>
+                        <a class="@NavClass(NavActive("Admin","TransferCenter"))" href="/Admin/TransferCenter">Transfer</a>
+                        <a class="@NavClass(NavActive("Admin","CargoPrice"))" href="/Admin/CargoPrice">Fiyatlar</a>
+                        <a class="@NavClass(NavActive("Admin","AuditLog"))" href="/Admin/AuditLog">Audit</a>
+                        <a class="@NavClass(NavActive("Admin","Report"))" href="/Admin/Report">Raporlar</a>
+                        <a class="@NavClass(NavActive("Admin","RoleAssign"))" href="/Admin/RoleAssign">Rol</a>
+                        <a class="@NavClass(NavActive("Admin","About"))" href="/Admin/About">Hakkımızda</a>
+                    }
+                    else if (User.IsInRole("Manager"))
+                    {
+                        <a class="@NavClass(NavActive("Manager","Dashboard"))" href="/Manager/Dashboard">Dashboard</a>
+                        <a class="@NavClass(NavActive("Manager","Cargo") && action is "Index" or "Create" or "Details" or "ChangeStatus")" href="/Manager/Cargo">Kargolar</a>
+                        <a class="@NavClass(NavActive("Manager","Cargo","OutForDelivery"))" href="/Manager/Cargo/OutForDelivery">Dağıtım</a>
+                        <a class="@NavClass(NavActive("Manager","Cargo","Problematic"))" href="/Manager/Cargo/Problematic">Sorunlu</a>
+                    }
+                    else if (User.IsInRole("User"))
+                    {
+                        <a class="@NavClass(NavActive("User","Dashboard"))" href="/User/Dashboard">Dashboard</a>
+                        <a class="@NavClass(NavActive("User","Cargo"))" href="/User/Cargo">Kargolarım</a>
+                    }
+                    else
+                    {
+                        <a class="@NavClass(false)" href="/Default/Index">Kargo Takip</a>
+                    }
+                </nav>
+            </div>
+            <div class="flex items-center gap-space-md shrink-0">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <div class="hidden sm:block text-right">
+                        <p class="text-label-md font-label-md text-on-surface leading-tight">@userName</p>
+                        <p class="text-label-sm font-label-sm text-on-surface-variant font-normal">@RoleLabel()</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-surface-container-highest border border-outline-variant flex items-center justify-center text-primary-container font-semibold text-xs">
+                        @initials
+                    </div>
+                    <a href="/Login/Logout" class="text-label-md font-label-md text-on-surface-variant hover:text-error transition-colors px-2 py-1">Çıkış</a>
+                }
+                else
+                {
+                    <a href="/Login" class="text-label-md font-label-md text-on-surface-variant hover:text-primary-container">Giriş</a>
+                    <a href="/Register/Signup" class="px-3 py-1.5 rounded-lg bg-primary-container text-on-primary text-label-md font-label-md">Kayıt</a>
+                }
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-grow w-full max-w-[1200px] mx-auto px-margin-sm md:px-margin py-6 md:py-8">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="mt-auto bg-primary-container border-t border-primary">
+        <div class="max-w-[1200px] mx-auto px-margin-sm md:px-margin py-space-lg flex flex-wrap justify-between gap-2 text-on-primary-container text-body-sm font-body-sm">
+            <span>© 2026 CargoTrack</span>
+            <span class="opacity-80">Lojistik &amp; Kargo Teknolojileri</span>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

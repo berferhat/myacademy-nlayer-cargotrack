@@ -1,0 +1,14 @@
+﻿using CargoTrack.Entity.Entities.Enums;
+
+namespace CargoTrack.DTO.DTOs.CargoPriceDtos
+{
+    public class CreateCargoPriceDto
+    {
+        public string Name { get; set; }
+        public CargoType? CargoType { get; set; }
+        public decimal BasePrice { get; set; }
+        public decimal PricePerKg { get; set; }
+        public decimal PricePerDesi { get; set; }
+        public bool IsActive { get; set; }
+    }
+}

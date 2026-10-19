@@ -1,0 +1,100 @@
+﻿@{
+    ViewData["Title"] = "Kargo Takip";
+    Layout = "~/Views/UILayout/Index.cshtml";
+}
+
+<div class="max-w-[1000px] mx-auto">
+    <div class="mb-8">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="text-label-sm font-label-sm tracking-wider uppercase text-on-surface-variant">Lojistik Takip Sistemi</span>
+        </div>
+        <h1 class="text-headline-xl font-headline-xl text-on-background">Kargo Takip</h1>
+        <p class="text-body-lg font-body-lg text-on-surface-variant mt-1">
+            Gönderinizin güncel durumunu öğrenmek için takip numaranızı giriniz.
+        </p>
+    </div>
+
+    <section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant mb-8">
+        <form class="space-y-4" asp-action="CargoDetails" asp-controller="Default" method="get">
+            <label class="block text-label-md font-label-md text-on-surface" for="trackCode">
+                Gönderi Takip Numarası
+            </label>
+            <div class="flex flex-col sm:flex-row items-stretch gap-3">
+                <div class="relative flex-grow">
+                    <span class="material-symbols-outlined absolute left-3.5 top-3.5 text-on-surface-variant text-[20px] pointer-events-none">pin</span>
+                    <input class="w-full h-12 pl-10 pr-4 text-headline-sm font-code-tabular text-on-background bg-surface-container-lowest border border-outline-variant rounded-lg uppercase tracking-wider focus:border-primary-container focus:ring-0 focus:outline-none transition-colors duration-150"
+                           id="trackCode"
+                           name="trackCode"
+                           placeholder="Örn: MYC-2026-258713"
+                           type="text" />
+                </div>
+                <button class="h-12 px-8 rounded-lg bg-secondary-container text-on-primary font-label-md text-label-md font-semibold hover:bg-[#e07b00] transition-colors duration-150 flex items-center justify-center gap-2 whitespace-nowrap"
+                        type="submit">
+                    <span class="material-symbols-outlined text-[20px]">search</span>
+                    Gönderiyi Sorgula
+                </button>
+            </div>
+            <div class="flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant pt-1 px-1">
+                <span>Standart kod yapısı: <strong class="font-semibold text-on-surface">MYC-YYYY-XXXXXX</strong></span>
+            </div>
+            @if (ViewBag.error != null)
+            {
+                <div class="mt-2 p-4 rounded-lg bg-error-container border border-error text-error text-body-md font-body-md flex items-start gap-3">
+                    <span class="material-symbols-outlined text-error text-[20px] mt-0.5 shrink-0">error</span>
+                    <span>@ViewBag.error</span>
+                </div>
+            }
+        </form>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+        <div class="lg:col-span-8">
+            <h2 class="text-headline-sm font-headline-sm text-on-background mb-4">Son Sorgulanan Gönderiler</h2>
+            <div class="flex flex-col gap-3">
+                <a href="/Default/CargoDetails?trackCode=MYC-2026-258713"
+                   class="bg-surface-container-lowest rounded-xl border border-outline-variant p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-l-4 border-l-primary-container no-underline hover:bg-surface-container-low transition-colors">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-3 mb-2">
+                            <span class="font-code-tabular text-code-tabular text-on-background">MYC-2026-258713</span>
+                            <span class="bg-surface-container-high text-primary-container px-2.5 py-1 rounded-full text-label-sm font-label-sm">Oluşturuldu</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-on-surface-variant text-body-md">
+                            <span>İstanbul</span>
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            <span>Ankara</span>
+                        </div>
+                    </div>
+                    <span class="text-on-surface-variant text-sm flex items-center gap-1">Sorgula <span class="material-symbols-outlined text-sm">chevron_right</span></span>
+                </a>
+                <a href="/Default/CargoDetails?trackCode=MYC-2026-969149"
+                   class="bg-surface-container-lowest rounded-xl border border-outline-variant p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-l-4 border-l-secondary-container no-underline hover:bg-surface-container-low transition-colors">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-3 mb-2">
+                            <span class="font-code-tabular text-code-tabular text-on-background">MYC-2026-969149</span>
+                            <span class="bg-surface-container-high text-primary-container px-2.5 py-1 rounded-full text-label-sm font-label-sm">Oluşturuldu</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-on-surface-variant text-body-md">
+                            <span>İstanbul</span>
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            <span>İzmir</span>
+                        </div>
+                    </div>
+                    <span class="text-on-surface-variant text-sm flex items-center gap-1">Sorgula <span class="material-symbols-outlined text-sm">chevron_right</span></span>
+                </a>
+            </div>
+        </div>
+        <div class="lg:col-span-4 mt-8 lg:mt-0">
+            <div class="bg-surface-container-low rounded-xl p-6 h-full border border-outline-variant">
+                <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary-container mb-4">
+                    <span class="material-symbols-outlined text-lg">lightbulb</span>
+                </div>
+                <h3 class="text-headline-sm font-headline-sm text-on-background mb-3">Takip numaramı nereden bulabilirim?</h3>
+                <p class="text-body-md font-body-md text-on-surface-variant">
+                    Gönderi oluşturulduğunda size verilen
+                    <strong class="text-on-background font-semibold">takip numarasını</strong>
+                    kullanabilirsiniz (ör. MYC-2026-258713).
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

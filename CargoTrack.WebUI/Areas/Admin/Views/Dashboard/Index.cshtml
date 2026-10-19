@@ -1,0 +1,261 @@
+﻿@model AdminDashboardDto
+
+@{
+    ViewData["Title"] = "Dashboard";
+    var userName = User.Identity?.Name ?? "admin";
+}
+
+<style>
+    .ad-kpi {
+        background: #fff;
+        border: 1px solid var(--ct-border);
+        border-radius: 0.75rem;
+        padding: 1rem 1.1rem;
+        height: 100%;
+    }
+    .ad-kpi .lbl {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ct-muted);
+        margin-bottom: 0.35rem;
+    }
+    .ad-kpi .val {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--ct-primary);
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+    }
+    .ad-kpi .hint {
+        font-size: 0.75rem;
+        color: var(--ct-muted);
+        margin-top: 0.35rem;
+    }
+    .ad-kpi a {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--ct-accent) !important;
+        text-decoration: none !important;
+    }
+    .ad-panel {
+        background: #fff;
+        border: 1px solid var(--ct-border);
+        border-radius: 0.75rem;
+        padding: 1.15rem 1.25rem;
+        height: 100%;
+    }
+    .ad-panel h2 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--ct-primary);
+        margin: 0 0 0.85rem;
+    }
+    .ad-donut-wrap {
+        position: relative;
+        width: 100%;
+        max-width: 220px;
+        height: 220px;
+        margin: 0 auto;
+    }
+    .ad-chart-box {
+        position: relative;
+        height: 240px;
+    }
+</style>
+
+<div class="ct-dash-welcome">
+    <div>
+        <div class="ct-crumb">Merkez Yönetim</div>
+        <h1>Hoş geldiniz, @userName</h1>
+        <p>Sistem geneli performans özeti.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="/Admin/Report" class="btn btn-outline-dark btn-sm">Raporlar</a>
+        <a href="/Admin/Cargo" class="btn btn-dark btn-sm">Tüm Kargolar</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-lg-3">
+        <div class="ad-kpi">
+            <div class="lbl">Toplam Kargo</div>
+            <div class="val">@Model.TotalCargos</div>
+            <div class="hint">Sistem geneli</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="ad-kpi">
+            <div class="lbl">Aktif</div>
+            <div class="val">@Model.ActiveCargos</div>
+            <div class="hint">Teslim / iade dışı</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="ad-kpi">
+            <div class="lbl">Geciken</div>
+            <div class="val" style="color:#c62828">@Model.DelayedCargos</div>
+            <div class="hint">ETA aşımı</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="ad-kpi">
+            <div class="lbl">Teslim Oranı</div>
+            <div class="val" style="color:#2e7d32">%@Model.DeliveryRatePercent.ToString("0")</div>
+            <div class="hint">Teslim: @Model.DeliveredCargos</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="ad-kpi">
+            <div class="lbl">Şube</div>
+            <div class="val">@Model.BranchCount</div>
+            <div class="hint"><a href="/Admin/Branch">Yönet →</a></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="ad-kpi">
+            <div class="lbl">Personel</div>
+            <div class="val">@Model.EmployeeCount</div>
+            <div class="hint"><a href="/Admin/Employee">Yönet →</a></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="ad-kpi">
+            <div class="lbl">Son 7 Gün</div>
+            <div class="val">@Model.Last7DaysCreatedCount</div>
+            <div class="hint">Yeni oluşturulan</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="ad-kpi">
+            <div class="lbl">Teslim Edilen</div>
+            <div class="val">@Model.DeliveredCargos</div>
+            <div class="hint">Toplam teslim</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-5">
+        <div class="ad-panel">
+            <h2>Durum dağılımı</h2>
+            <div class="ad-donut-wrap">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="ad-panel">
+            <h2>En yoğun şubeler (çıkış)</h2>
+            <div class="ad-chart-box">
+                <canvas id="branchChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const statusLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StatusLabels));
+        const statusCounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StatusCounts));
+        const branchLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopBranchLabels));
+        const branchCounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopBranchCounts));
+
+        // Kurumsal navy / soft mavi paleti (turuncu tek aksan)
+        const statusPalette = [
+            '#001e3c',
+            '#2f4868',
+            '#486081',
+            '#6f87aa',
+            '#afc8ee',
+            '#1565c0',
+            '#43474e',
+            '#c4c6ce',
+            '#fd8b00'
+        ];
+
+        new Chart(document.getElementById('statusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusCounts,
+                    backgroundColor: statusPalette,
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '62%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 10,
+                            boxHeight: 10,
+                            padding: 12,
+                            color: '#43474e',
+                            font: { size: 11, family: 'Hanken Grotesk' },
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => {
+                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0) || 1;
+                                const v = ctx.raw || 0;
+                                const pct = Math.round((v * 100) / total);
+                                return ` ${ctx.label}: ${v} (%${pct})`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('branchChart'), {
+            type: 'line',
+            data: {
+                labels: branchLabels,
+                datasets: [{
+                    data: branchCounts,
+                    borderColor: '#001e3c',
+                    backgroundColor: 'rgba(0, 30, 60, 0.12)',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#fd8b00',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        ticks: { color: '#43474e', font: { size: 11 } },
+                        grid: { display: false }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0, color: '#74777e', font: { size: 11 } },
+                        grid: { color: '#eef2f7' }
+                    }
+                }
+            }
+        });
+    </script>
+}

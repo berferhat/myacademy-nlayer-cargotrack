@@ -1,0 +1,24 @@
+## Visual Studio / .NET
+.vs/
+*.user
+*.suo
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+*.dbmdl
+*.jfm
+appsettings.*.local.json
+
+## Cursor / AI tooling 
+.cursor/
+.cursorrules
+*.mdc
+AGENTS.md
+
+## Stitch / tasarım taslakları (AI çıktısı)
+CargoTrack.WebUI/wwwroot/ui-template/
+
+## OS
+Thumbs.db
+Desktop.ini

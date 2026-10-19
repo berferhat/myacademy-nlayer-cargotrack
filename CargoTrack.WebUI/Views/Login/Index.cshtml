@@ -1,0 +1,53 @@
+﻿@model LoginUserDto
+
+@{
+    ViewData["Title"] = "Giriş";
+    Layout = "~/Views/UILayout/Index.cshtml";
+}
+
+<div class="w-full max-w-[440px] mx-auto">
+    <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8">
+        <div class="mb-6">
+            <p class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase mb-1.5 font-bold">CargoTrack Portal</p>
+            <h1 class="text-headline-lg font-headline-lg text-primary-container tracking-tight">Giriş Yap</h1>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-1.5">Sisteme erişmek için kullanıcı bilgilerinizi giriniz.</p>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="bg-error-container text-error border border-error/30 rounded-lg p-3 text-body-sm font-body-sm flex items-start gap-2 mb-6" role="alert">
+                <span class="material-symbols-outlined text-[18px] text-error flex-shrink-0 mt-0.5">error</span>
+                <div asp-validation-summary="All"></div>
+            </div>
+        }
+
+        <form method="post" class="space-y-5">
+            <div>
+                <label class="block font-label-md text-label-md text-on-surface mb-2 font-semibold" asp-for="UserName">Kullanıcı Adı</label>
+                <input asp-for="UserName" required
+                       class="w-full h-[46px] px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/10"
+                       placeholder="ornek.kullanici" autocomplete="username" />
+            </div>
+            <div>
+                <label class="block font-label-md text-label-md text-on-surface mb-2 font-semibold" asp-for="Password">Şifre</label>
+                <input asp-for="Password" type="password" required
+                       class="w-full h-[46px] px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/10"
+                       placeholder="••••••••" autocomplete="current-password" />
+            </div>
+            <div class="pt-2">
+                <button class="w-full h-[46px] bg-primary-container text-on-primary hover:bg-[#0a2d54] font-label-md text-label-md font-semibold rounded-lg flex items-center justify-center gap-2 transition-colors"
+                        type="submit">
+                    <span>Giriş Yap</span>
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-6 pt-6 border-t border-outline-variant/60 text-center">
+            <p class="font-body-md text-body-md text-on-surface-variant">
+                Hesabın yok mu?
+                <a class="font-semibold text-primary-container hover:text-secondary hover:underline ml-1" href="/Register/Signup">Kayıt Ol</a>
+            </p>
+        </div>
+    </section>
+</div>

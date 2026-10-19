@@ -1,0 +1,71 @@
+﻿@model List<ResultCargoDto>
+@using CargoTrack.Entity.Entities.Enums
+
+@{
+    ViewData["Title"] = "Dağıtımda";
+
+    string StatusLabel(CargoStatus s) => s switch
+    {
+        CargoStatus.OutForDelivery => "Dağıtıma Çıktı",
+        _ => s.ToString()
+    };
+}
+
+<div class="ct-page-header">
+    <div>
+        <h1>Dağıtımda</h1>
+        <p class="ct-subtitle">Şubenizde dağıtıma çıkmış gönderiler.</p>
+    </div>
+    <a href="/Manager/Cargo/Index" class="btn btn-outline-dark btn-sm">Tüm Kargolar</a>
+</div>
+
+<div class="ct-list-card">
+    <div class="table-responsive">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="ct-empty">Dağıtımda kargo yok.</div>
+        }
+        else
+        {
+            <table class="ct-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Takip No</th>
+                        <th>Durum</th>
+                        <th>Gönderim</th>
+                        <th>ETA</th>
+                        <th class="text-end">Fiyat</th>
+                        <th>Teslim Kodu</th>
+                        <th class="text-center">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int count = 0;
+                    }
+                    @foreach (var item in Model)
+                    {
+                        count++;
+                        <tr>
+                            <td class="text-muted small">@count</td>
+                            <td><span class="ct-track">@item.TrackCode</span></td>
+                            <td>
+                                <span class="ct-status ct-status-delivery"><span class="dot"></span>@StatusLabel(item.CargoStatus)</span>
+                            </td>
+                            <td>@item.ShipmentDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@item.EstimatedArrivalDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td class="text-end">@(item.Price.HasValue ? $"{item.Price:N2} ₺" : "—")</td>
+                            <td>@(string.IsNullOrEmpty(item.DeliveryCode) ? "—" : item.DeliveryCode)</td>
+                            <td class="text-center">
+                                <a href="/Manager/Cargo/ChangeStatus/@item.Id" class="btn btn-sm btn-outline-dark me-1">Durum</a>
+                                <a href="/Manager/Cargo/Details/@item.Id" class="btn btn-sm btn-outline-dark">Detay</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+    <div class="ct-list-footer">Toplam <strong>@(Model?.Count ?? 0)</strong> gönderi</div>
+</div>

@@ -1,0 +1,64 @@
+﻿@model List<ResultAboutDto>
+
+@{
+    ViewData["Title"] = "Hakkımızda";
+}
+
+<div class="ct-page-header">
+    <div>
+        <h1>Hakkımızda</h1>
+        <p class="ct-subtitle">Kurumsal içerik blokları.</p>
+    </div>
+    <a href="/Admin/About/Create" class="btn btn-dark btn-sm">Yeni İçerik</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="ct-list-card">
+        <div class="ct-empty">
+            <p class="mb-3">Henüz hakkımızda bilgisi oluşturulmamış.</p>
+            <a href="/Admin/About/Create" class="btn btn-dark btn-sm">Yeni Hakkımızda Oluştur</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="ct-list-card">
+        <div class="table-responsive">
+            <table class="ct-table">
+                <thead>
+                    <tr>
+                        <th>Görsel</th>
+                        <th>Başlık</th>
+                        <th>Açıklama</th>
+                        <th class="text-center">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" alt="" style="height:48px;width:48px;border-radius:0.5rem;object-fit:cover;border:1px solid var(--ct-border)" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">—</span>
+                                }
+                            </td>
+                            <td class="fw-semibold">@item.Title</td>
+                            <td class="small text-muted">@item.Description</td>
+                            <td class="text-center">
+                                <a href="/Admin/About/Update/@item.Id" class="btn btn-sm btn-outline-dark me-1">Güncelle</a>
+                                <a href="/Admin/About/Delete/@item.Id" onclick="return confirm('Silmek istediğinize emin misiniz?')" class="btn btn-sm btn-outline-danger">Sil</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="ct-list-footer">Toplam <strong>@Model.Count</strong> içerik</div>
+    </div>
+}

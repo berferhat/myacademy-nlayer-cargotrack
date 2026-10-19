@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Hata";
+    Layout = "~/Views/UILayout/Index.cshtml";
+    var requestId = ViewBag.RequestId as string;
+}
+
+<div class="w-full max-w-[540px] mx-auto bg-surface-container-lowest border border-outline-variant rounded-xl p-8 md:p-10 text-center">
+    <div class="w-16 h-16 rounded-full bg-surface-container-low text-primary-container mx-auto flex items-center justify-center border border-outline-variant mb-2">
+        <span class="material-symbols-outlined text-3xl">report_problem</span>
+    </div>
+    <span class="text-label-sm font-label-sm uppercase tracking-wider text-on-surface-variant bg-surface-container-low border border-outline-variant px-3 py-1 rounded-full inline-block mt-4 mb-3">
+        Sistem Uyarısı
+    </span>
+    <h1 class="text-headline-lg font-headline-lg text-primary-container tracking-tight mb-2">Bir şeyler ters gitti</h1>
+    <p class="text-body-md font-body-md text-on-surface-variant max-w-[460px] mx-auto mb-6">
+        @(ViewBag.Message ?? "İsteğiniz işlenirken beklenmeyen bir hata oluştu. Lütfen kısa bir süre sonra tekrar deneyin.")
+    </p>
+    @if (!string.IsNullOrEmpty(requestId))
+    {
+        <div class="bg-surface-container-low border border-outline-variant rounded-lg p-4 text-left mb-6 text-on-surface">
+            <p class="text-label-sm font-label-sm uppercase tracking-wider text-on-surface-variant mb-2">İstek Kimliği</p>
+            <p class="font-code-tabular text-code-tabular text-primary-container break-all">@requestId</p>
+        </div>
+    }
+    <a href="/Default/Index"
+       class="inline-flex w-full sm:w-auto px-6 py-2.5 rounded-lg text-label-md font-label-md bg-primary-container text-on-primary hover:bg-[#0a2d54] transition-colors text-center justify-center">
+        Ana Sayfaya Dön
+    </a>
+</div>

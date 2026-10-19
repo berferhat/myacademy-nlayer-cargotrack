@@ -1,0 +1,156 @@
+﻿@model ManagerDashboardDto
+@using CargoTrack.Entity.Entities.Enums
+
+@{
+    ViewData["Title"] = "Dashboard";
+    var userName = User.Identity?.Name ?? "yönetici";
+
+    string StatusCss(CargoStatus s) => s switch
+    {
+        CargoStatus.Delivered or CargoStatus.ReturnedToSender => "ct-status-done",
+        CargoStatus.OutForDelivery => "ct-status-delivery",
+        CargoStatus.AtTransferCenter or CargoStatus.AtOriginBranch or CargoStatus.AtDestinationBranch => "ct-status-transit",
+        CargoStatus.DeliveryFailed or CargoStatus.InReturnProcess => "ct-status-fail",
+        _ => "ct-status-created"
+    };
+
+    string StatusLabel(CargoStatus s) => s switch
+    {
+        CargoStatus.Created => "Oluşturuldu",
+        CargoStatus.AtOriginBranch => "Çıkış Şubesinde",
+        CargoStatus.AtTransferCenter => "Transfer Merkezinde",
+        CargoStatus.AtDestinationBranch => "Varış Şubesinde",
+        CargoStatus.OutForDelivery => "Dağıtıma Çıktı",
+        CargoStatus.Delivered => "Teslim Edildi",
+        CargoStatus.DeliveryFailed => "Teslim Başarısız",
+        CargoStatus.InReturnProcess => "İade Sürecinde",
+        CargoStatus.ReturnedToSender => "İade Edildi",
+        _ => s.ToString()
+    };
+}
+
+<div class="ct-dash-welcome">
+    <div>
+        <div class="ct-crumb">Şube Operasyon Paneli</div>
+        <h1>Hoş geldiniz, @userName</h1>
+        <p>Şube operasyon özetiniz ve hızlı işlemler.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="/Manager/Cargo/Create" class="btn btn-dark btn-sm">Yeni Kargo</a>
+        <a href="/Manager/Cargo/Index" class="btn btn-outline-dark btn-sm">Kargolar</a>
+    </div>
+</div>
+
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger">@TempData["error"]</div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-4">
+        <div class="ct-dash-card accent-navy">
+            <div>
+                <span class="ct-dash-label">Bugün gelen</span>
+                <div class="ct-dash-value">@Model.TodayIncoming</div>
+            </div>
+            <div class="ct-dash-foot"><span>Varış şubesine</span></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-4">
+        <div class="ct-dash-card accent-orange">
+            <div>
+                <span class="ct-dash-label">Bugün çıkan</span>
+                <div class="ct-dash-value">@Model.TodayOutgoing</div>
+            </div>
+            <div class="ct-dash-foot"><span>Çıkış şubesinden</span></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-4">
+        <div class="ct-dash-card accent-orange">
+            <div>
+                <span class="ct-dash-label">Dağıtımda</span>
+                <div class="ct-dash-value">@Model.OutForDeliveryCount</div>
+            </div>
+            <div class="ct-dash-foot">
+                <span>Out for delivery</span>
+                <a href="/Manager/Cargo/OutForDelivery">Liste →</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-4">
+        <div class="ct-dash-card accent-green">
+            <div>
+                <span class="ct-dash-label">Teslim</span>
+                <div class="ct-dash-value">@Model.DeliveredCount</div>
+            </div>
+            <div class="ct-dash-foot"><span>Teslim edilen</span></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-4">
+        <div class="ct-dash-card accent-red">
+            <div>
+                <span class="ct-dash-label">Geciken</span>
+                <div class="ct-dash-value">@Model.DelayedCount</div>
+            </div>
+            <div class="ct-dash-foot"><span>ETA aşımı</span></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-4">
+        <div class="ct-dash-card accent-red">
+            <div>
+                <span class="ct-dash-label">Sorunlu</span>
+                <div class="ct-dash-value">@Model.ProblematicCount</div>
+            </div>
+            <div class="ct-dash-foot">
+                <span>Başarısız / iade</span>
+                <a href="/Manager/Cargo/Problematic">Liste →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ct-list-card">
+    <div class="ct-list-toolbar d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <strong style="color:var(--ct-primary);font-size:1.15rem">Son kargolar</strong>
+            <span class="ct-badge-count">@Model.RecentCargos.Count</span>
+        </div>
+        <a href="/Manager/Cargo/Index" class="btn btn-dark btn-sm">Tüm Kargolar</a>
+    </div>
+    <div class="table-responsive">
+        @if (Model.RecentCargos == null || !Model.RecentCargos.Any())
+        {
+            <div class="ct-empty">Henüz kargo yok.</div>
+        }
+        else
+        {
+            <table class="ct-table">
+                <thead>
+                    <tr>
+                        <th>Takip No</th>
+                        <th>Durum</th>
+                        <th>Gönderim</th>
+                        <th class="text-end">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.RecentCargos)
+                    {
+                        <tr>
+                            <td><span class="ct-track">@item.TrackCode</span></td>
+                            <td>
+                                <span class="ct-status @StatusCss(item.CargoStatus)">
+                                    <span class="dot"></span>@StatusLabel(item.CargoStatus)
+                                </span>
+                            </td>
+                            <td>@item.ShipmentDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td class="text-end">
+                                <a href="/Manager/Cargo/Details/@item.Id" class="btn btn-sm btn-outline-dark">Detay</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

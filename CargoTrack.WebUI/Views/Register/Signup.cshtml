@@ -1,0 +1,82 @@
+﻿@model RegisterUserDto
+
+@{
+    ViewData["Title"] = "Kayıt";
+    Layout = "~/Views/UILayout/Index.cshtml";
+}
+
+<div class="w-full max-w-[640px] mx-auto">
+    <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 md:p-10">
+        <div class="mb-8">
+            <p class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase mb-1.5 font-bold">Yeni Hesap</p>
+            <h1 class="text-headline-lg font-headline-lg text-primary-container tracking-tight">Kayıt Ol</h1>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-1.5">CargoTrack hesabı oluşturun.</p>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="bg-error-container text-on-error-container p-3 rounded-lg text-sm mb-6" role="alert">
+                <div asp-validation-summary="All"></div>
+            </div>
+        }
+
+        <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+                <label class="block font-label-md text-label-md text-on-surface mb-2 font-semibold" asp-for="FirstName">Ad</label>
+                <input asp-for="FirstName" required
+                       class="w-full h-[46px] px-3.5 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface focus:border-primary-container focus:ring-2 focus:ring-primary-container/10 outline-none"
+                       placeholder="Adınız" />
+                <span class="text-error text-sm" asp-validation-for="FirstName"></span>
+            </div>
+            <div>
+                <label class="block font-label-md text-label-md text-on-surface mb-2 font-semibold" asp-for="LastName">Soyad</label>
+                <input asp-for="LastName" required
+                       class="w-full h-[46px] px-3.5 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface focus:border-primary-container focus:ring-2 focus:ring-primary-container/10 outline-none"
+                       placeholder="Soyadınız" />
+                <span class="text-error text-sm" asp-validation-for="LastName"></span>
+            </div>
+            <div class="md:col-span-2">
+                <label class="block font-label-md text-label-md text-on-surface mb-2 font-semibold" asp-for="Email">E-posta</label>
+                <input asp-for="Email" type="email" required
+                       class="w-full h-[46px] px-3.5 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface focus:border-primary-container focus:ring-2 focus:ring-primary-container/10 outline-none"
+                       placeholder="ad.soyad@ornek.com" />
+                <span class="text-error text-sm" asp-validation-for="Email"></span>
+            </div>
+            <div class="md:col-span-2">
+                <label class="block font-label-md text-label-md text-on-surface mb-2 font-semibold" asp-for="UserName">Kullanıcı Adı</label>
+                <input asp-for="UserName" required
+                       class="w-full h-[46px] px-3.5 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface focus:border-primary-container focus:ring-2 focus:ring-primary-container/10 outline-none"
+                       placeholder="Kullanıcı adınız" />
+                <span class="text-error text-sm" asp-validation-for="UserName"></span>
+            </div>
+            <div>
+                <label class="block font-label-md text-label-md text-on-surface mb-2 font-semibold" asp-for="Password">Şifre</label>
+                <input asp-for="Password" type="password" required
+                       class="w-full h-[46px] px-3.5 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface focus:border-primary-container focus:ring-2 focus:ring-primary-container/10 outline-none"
+                       placeholder="En az 8 karakter" />
+                <span class="text-error text-sm" asp-validation-for="Password"></span>
+            </div>
+            <div>
+                <label class="block font-label-md text-label-md text-on-surface mb-2 font-semibold" asp-for="ConfirmPassword">Şifre Tekrarı</label>
+                <input asp-for="ConfirmPassword" type="password" required
+                       class="w-full h-[46px] px-3.5 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface focus:border-primary-container focus:ring-2 focus:ring-primary-container/10 outline-none"
+                       placeholder="Şifrenizi tekrar girin" />
+                <span class="text-error text-sm" asp-validation-for="ConfirmPassword"></span>
+            </div>
+            <div class="md:col-span-2 pt-2">
+                <button type="submit"
+                        class="w-full h-[46px] bg-primary-container text-on-primary font-label-md font-semibold rounded-lg hover:bg-[#0a2d54] flex items-center justify-center gap-2 transition-colors">
+                    <span>Kayıt Ol</span>
+                    <span class="material-symbols-outlined text-[18px]">how_to_reg</span>
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-outline-variant/60 text-center">
+            <p class="font-body-md text-body-md text-on-surface-variant">
+                Zaten hesabın var mı?
+                <a class="font-semibold text-primary-container hover:underline ml-1" href="/Login">Giriş yap</a>
+            </p>
+        </div>
+    </section>
+</div>

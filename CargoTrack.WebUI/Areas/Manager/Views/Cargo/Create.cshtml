@@ -1,0 +1,57 @@
+﻿@model CreateCargoDto
+
+@{
+    ViewData["Title"] = "Yeni Kargo";
+}
+
+<div class="ct-page-header">
+    <div>
+        <h1>Yeni Kargo</h1>
+        <p class="ct-subtitle">Gönderici / alıcı seçimi ve paket bilgileri ile kargo oluşturun.</p>
+    </div>
+    <a href="/Manager/Cargo/Index" class="btn btn-outline-dark btn-sm">Listeye Dön</a>
+</div>
+
+<div class="ct-form-card">
+    <form method="post">
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+        <span asp-validation-for="Weight" class="text-danger"></span>
+
+        <div class="mb-3">
+            <label asp-for="SenderId" class="form-label">Gönderici</label>
+            <select asp-for="SenderId" asp-items="ViewBag.users" class="form-select"></select>
+        </div>
+        <div class="mb-3">
+            <label asp-for="ReceiverId" class="form-label">Alıcı</label>
+            <select asp-for="ReceiverId" asp-items="ViewBag.users" class="form-select"></select>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-6 mb-3">
+                <label asp-for="OriginBranchId" class="form-label">Çıkış Şubesi</label>
+                <select asp-for="OriginBranchId" asp-items="ViewBag.branches" class="form-select"></select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="DestinationBranchId" class="form-label">Varış Şubesi</label>
+                <select asp-for="DestinationBranchId" asp-items="ViewBag.branches" class="form-select"></select>
+            </div>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-4 mb-3">
+                <label asp-for="Weight" class="form-label">Ağırlık (kg)</label>
+                <input asp-for="Weight" class="form-control" />
+            </div>
+            <div class="col-md-4 mb-3">
+                <label asp-for="PackageSize" class="form-label">Paket boyutu</label>
+                <select asp-for="PackageSize" asp-items="ViewBag.packageSizes" class="form-select"></select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label asp-for="CargoType" class="form-label">Kargo Tipi</label>
+                <select asp-for="CargoType" asp-items="ViewBag.cargoTypes" class="form-select"></select>
+            </div>
+        </div>
+        <div class="d-flex gap-2 pt-2">
+            <button type="submit" class="btn btn-dark">Kaydet</button>
+            <a href="/Manager/Cargo/Index" class="btn btn-outline-dark">İptal</a>
+        </div>
+    </form>
+</div>

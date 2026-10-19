@@ -1,0 +1,62 @@
+﻿@model List<ResultCargoPriceDto>
+
+@{
+    ViewData["Title"] = "Fiyat Tanımları";
+    int count = 0;
+}
+
+<div class="ct-page-header">
+    <div>
+        <h1>Fiyat Tanımları</h1>
+        <p class="ct-subtitle">Taban, kg ve desi bazlı fiyat katmanları.</p>
+    </div>
+    <a href="/Admin/CargoPrice/Create" class="btn btn-dark btn-sm">Yeni Fiyat</a>
+</div>
+
+<div class="ct-list-card">
+    <div class="table-responsive">
+        <table class="ct-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Ad</th>
+                    <th>Tip</th>
+                    <th class="text-end">Base</th>
+                    <th class="text-end">Kg</th>
+                    <th class="text-end">Desi</th>
+                    <th>Aktif</th>
+                    <th class="text-center">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    count++;
+                    <tr>
+                        <td class="text-muted small">@count</td>
+                        <td class="fw-semibold">@item.Name</td>
+                        <td>@item.CargoType</td>
+                        <td class="text-end">@item.BasePrice.ToString("N2") ₺</td>
+                        <td class="text-end">@item.PricePerKg.ToString("N2") ₺</td>
+                        <td class="text-end">@item.PricePerDesi.ToString("N2") ₺</td>
+                        <td>
+                            @if (item.IsActive)
+                            {
+                                <span class="ct-status ct-status-done"><span class="dot"></span>Evet</span>
+                            }
+                            else
+                            {
+                                <span class="ct-status ct-status-created"><span class="dot"></span>Hayır</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <a href="/Admin/CargoPrice/Update/@item.Id" class="btn btn-sm btn-outline-dark me-1">Güncelle</a>
+                            <a href="/Admin/CargoPrice/Delete/@item.Id" onclick="return confirm('Silmek istediğinize emin misiniz?')" class="btn btn-sm btn-outline-danger">Sil</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="ct-list-footer">Toplam <strong>@count</strong> fiyat tanımı</div>
+</div>

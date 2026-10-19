@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Erişim Engellendi";
+    Layout = "~/Views/UILayout/Index.cshtml";
+}
+
+<div class="w-full max-w-[540px] mx-auto bg-surface-container-lowest border border-outline-variant rounded-xl p-8 md:p-10 text-center">
+    <div class="w-16 h-16 rounded-full bg-error-container text-error mx-auto flex items-center justify-center border border-error/20 mb-4">
+        <span class="material-symbols-outlined text-3xl filled-icon">lock</span>
+    </div>
+    <span class="text-label-sm font-label-sm uppercase tracking-wider text-error bg-error-container px-3 py-1 rounded-full inline-block mb-3">
+        403 • Erişim Engellendi
+    </span>
+    <h1 class="text-headline-lg font-headline-lg text-primary-container tracking-tight mb-2">Erişim Engellendi</h1>
+    <p class="text-body-md font-body-md text-on-surface-variant max-w-[460px] mx-auto mb-6">
+        Bu sayfayı görüntüleme yetkiniz yok. Gerekli role sahip bir hesapla giriş yapın veya ana sayfaya dönün.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+        <a href="/Default/Index"
+           class="w-full sm:w-auto px-6 py-2.5 rounded-lg text-label-md font-label-md border border-outline-variant text-primary-container hover:bg-surface-container-low transition-colors text-center">
+            Ana Sayfa
+        </a>
+        <a href="/Login"
+           class="w-full sm:w-auto px-6 py-2.5 rounded-lg text-label-md font-label-md bg-secondary-container text-on-primary hover:bg-[#e07b00] transition-colors text-center">
+            Giriş Yap
+        </a>
+    </div>
+</div>
