@@ -4,8 +4,6 @@ ASP.NET Core 8 MVC ile geliştirilmiş, rol bazlı bir kargo takip ve şube oper
 
 Amaç: Sadece CRUD değil; durum geçişleri, teslimat doğrulama, fiyat hesaplama ve yetki filtresinin **Service** katmanında yaşadığı bir N-Layer örnek.
 
-Kod İngilizce, arayüz Türkçe.
-
 ---
 
 ## Ne yapıyor?
